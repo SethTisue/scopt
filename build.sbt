@@ -34,9 +34,6 @@ lazy val scopt = (crossProject(JSPlatform, JVMPlatform, NativePlatform) in file(
     // scaladoc fix
     unmanagedClasspath in Compile += Attributed.blank(new java.io.File("doesnotexist"))
   ).
-  platformsSettings(JVMPlatform, JSPlatform)(
-    libraryDependencies += "org.scala-lang.modules" %%% "scala-parser-combinators" % "1.1.1" % Test
-  ).
   jsSettings(
     scalaJSModuleKind := ModuleKind.CommonJSModule,
     scalacOptions += {
