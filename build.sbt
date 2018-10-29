@@ -1,10 +1,12 @@
-import Dependencies._
 import com.typesafe.sbt.pgp.PgpKeys._
 
 // shadow sbt-scalajs' crossProject and CrossType until Scala.js 1.0.0 is released
 import sbtcrossproject.{crossProject, CrossType}
 
-def v: String = "3.7.0"
+// these are repeated in .travis.yml
+lazy val scala211 = "2.11.12"
+lazy val scala212 = "2.12.7"
+lazy val scala213 = "2.13.0-M5"
 
 lazy val root = project.in(file(".")).
   aggregate(scoptJS, scoptJVM, scoptNative).
@@ -16,9 +18,9 @@ lazy val root = project.in(file(".")).
 lazy val scopt = (crossProject(JSPlatform, JVMPlatform, NativePlatform) in file(".")).
   settings(
     inThisBuild(Seq(
-      version := v,
+      version := "3.7.0",
       scalaVersion := scala212,
-      crossScalaVersions := Seq(scala211, scala210, scala212, scala213),
+      crossScalaVersions := Seq(scala212, scala211, scala213)
     )),
     name := "scopt",
     // site
@@ -33,7 +35,7 @@ lazy val scopt = (crossProject(JSPlatform, JVMPlatform, NativePlatform) in file(
     unmanagedClasspath in Compile += Attributed.blank(new java.io.File("doesnotexist"))
   ).
   platformsSettings(JVMPlatform, JSPlatform)(
-    libraryDependencies ++= parserCombinators.value,
+    libraryDependencies += "org.scala-lang.modules" %%% "scala-parser-combinators" % "1.1.1" % Test
   ).
   jsSettings(
     scalaJSModuleKind := ModuleKind.CommonJSModule,
@@ -41,16 +43,6 @@ lazy val scopt = (crossProject(JSPlatform, JVMPlatform, NativePlatform) in file(
       val a = (baseDirectory in LocalRootProject).value.toURI.toString
       val g = "https://raw.githubusercontent.com/scopt/scopt/" + sys.process.Process("git rev-parse HEAD").lineStream_!.head
       s"-P:scalajs:mapSourceURI:$a->$g/"
-    },
-    sources in Test := {
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, 10)) =>
-          // specs 4.x does not support scala 2.10
-          // specs 3.x does not support scala-js
-          Nil
-        case _ =>
-          (sources in Test).value
-      }
     }
   ).
   nativeSettings(
