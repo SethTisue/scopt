@@ -1,6 +1,6 @@
 package scopt
 
-
+import scala.language.existentials
 
 import collection.mutable.ListBuffer
 import collection.immutable.ListMap
